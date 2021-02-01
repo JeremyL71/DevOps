@@ -1,26 +1,17 @@
 version: '3'
 
 services:
-  backend​:
-    build​:
-      context: "./backend​"
-      dockerfile: "dockerfile"
-    networks​:
-      #todo
-    depends_on​:
-      #todo
-  database​:
-    ​build​:
-      context: ".database​"
-      dockerfile: "dockerfile"
-    ​networks​:
-      #todo
-  h​ttpd​:
-    ​build​:
-      #todo
-    ​ports​:
-      #todo
-  ​  networks​:
-      #todo​
-    depends_on​:
-      #todo
+  adminer:
+    image: dockette/adminer:full-php5
+    restart: always
+    ports:
+      - 8080:80
+  dbPostgres:
+    image: postgres:11.6-alpine
+    restart: always
+    ports:
+        - 5432:5432
+    environment:
+        POSTGRES_USER: root
+        POSTGRES_PASSWORD: pwd
+        POSTGRES_DB: mydb
