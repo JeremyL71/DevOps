@@ -1,0 +1,26 @@
+version: '3'
+
+services:
+  backend​:
+    build​:
+      context: "./backend​"
+      dockerfile: "dockerfile"
+    networks​:
+      #todo
+    depends_on​:
+      #todo
+  database​:
+    ​build​:
+      context: ".database​"
+      dockerfile: "dockerfile"
+    ​networks​:
+      #todo
+  h​ttpd​:
+    ​build​:
+      #todo
+    ​ports​:
+      #todo
+  ​  networks​:
+      #todo​
+    depends_on​:
+      #todo
