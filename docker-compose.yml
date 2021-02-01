@@ -6,10 +6,22 @@ services:
     restart: always
     ports:
       - 8080:80
+    networks:
+      - proxynet
   database:
     build:
       context: database
       dockerfile: "Dockerfile"
     restart: always
     ports:
-        - 5432:5432
+        - 9000:5432
+    networks:
+      - proxynet
+    environment:
+        POSTGRES_USER: usr
+        POSTGRES_PASSWORD: pwd
+        POSTGRES_DB: db
+
+networks:
+  proxynet:
+    name: custom_network
