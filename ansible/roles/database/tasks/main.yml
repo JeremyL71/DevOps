@@ -1,0 +1,21 @@
+---
+# tasks file for roles/database
+- name: Copy .env file
+  copy:
+    src: .env
+    dest: /tmp/.env
+
+- name: Create persistency folder
+  file:
+    path: /opt/data
+    state: directory
+
+- name: Run Database
+  docker_container:
+    name: database
+    image: postgres:12.0-alpine
+    networks:
+      - name: app-network
+    env_file: /tmp/.env
+    volumes:
+      - /opt/data:/var/lib/postgresql/data

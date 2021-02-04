@@ -1,6 +1,11 @@
-## TP: 01/02/2021: Docker
+# sample-application-students
+This is a sample application Springboot - Vue - Postgres Student application
 
-**Database:**
-*Why should we run the container with a flag -e to give the environment variables ?*
+## Backend
+Simple Rest API Server
 
- 1. When creating the container, the environment variables are not automatically transmitted (due to isolation). There are several ways to pass variables to the docker container: https://docs.docker.com/compose/environment-variables/
+## Frontend
+Simple Vue.js Client
+
+## Database
+Simple Postgres 9 Database

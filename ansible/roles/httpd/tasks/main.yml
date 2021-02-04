@@ -1,0 +1,10 @@
+---
+# tasks file for roles/httpd
+- name: Run HTTPD
+  docker_container:
+    name: frontend
+    image: aiveo/sample-application-frontend
+    published_ports:
+      - "80:80"
+    networks:
+      - name: app-network

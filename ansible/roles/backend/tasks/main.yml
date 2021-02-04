@@ -1,0 +1,14 @@
+---
+# tasks file for roles/backend
+- name: Copy .env file
+  copy:
+    src: .env
+    dest: /tmp/.env
+
+- name: Run Backend
+  docker_container:
+    name: backend
+    image: aiveo/sample-application-backend
+    networks:
+      - name: app-network
+    env_file: /tmp/.env
