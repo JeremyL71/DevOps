@@ -1,0 +1,77 @@
+git:
+  depth: 5
+
+stages:
+  - "Build and Test"
+  - "Package"
+  - "Deploy"
+
+jobs:
+  include:
+    - stage: "Build and Test"
+      language: java
+      jdk: oraclejdk11
+      before_script:
+        - cd sample-application-backend
+      script:
+        - echo "Maven build"
+        - echo "Run test coverage and Quality Gate"
+        - echo "Maven sonar"
+        - mvn clean verify sonar:sonar -Dsonar.projectKey=Aiveo_sample-application-students
+    
+    - stage: "Build and Test"
+      language: node.js
+      node_js: "12.20"
+      before_script:
+        - cd sample-application-frontend
+      script:
+        - echo "NPM install and build"
+        - npm install
+        - npm run build
+        - npm run test
+        - npm run lint
+
+    - stage: "Package"
+      before_script:
+        - cd sample-application-backend
+      script:
+        - echo "Docker build ..."
+        - docker build -t $DOCKERHUB_USER/sample-application-backend .
+        - echo "Docker login ..."
+        - docker login -u $DOCKERHUB_USER -p $DOCKERHUB_PASSWD
+        - echo "Docker push ..."
+        - docker push $DOCKERHUB_USER/sample-application-backend
+    
+    - stage: "Package"
+      before_script:
+        - cd sample-application-frontend
+      script:
+        - echo "Docker build ..."
+        - docker build -t $DOCKERHUB_USER/sample-application-frontend .
+        - echo "Docker login ..."
+        - docker login -u $DOCKERHUB_USER -p $DOCKERHUB_PASSWD
+        - echo "Docker push ..."
+        - docker push $DOCKERHUB_USER/sample-application-frontend
+
+    - stage: "Deploy"
+      before_script:
+        - cd ansible
+      script:
+        - chmod 400 id_rsa
+        - echo "Docker build"
+        - sudo docker build -t ansible .
+        - echo "Run ansible process"
+        - sudo docker run -e "VAULT_PASS=$VAULT_PASS" ansible
+
+cache:
+  directories:
+    - "$HOME/.m2/repository"
+    - "$HOME/.npm"
+
+services:
+  - docker
+
+addons:
+  sonarcloud:
+    organization: "aiveo"
+    token: "$SONARCLOUD_TOKEN"

@@ -104,3 +104,12 @@ https://docs.spring.io/spring-boot/docs/current/reference/html/production-ready-
 You can use $**basearch** to reference the base architecture of the system. For example, i686 machines have a base architecture of i386 , and AMD64 and Intel 64 machines have a base architecture of x86_64 . This allows whatever the machine, to deploy with the right base of architecture
 
 # Conclusion
+In conclusion, here is our deployment process. Thanks to the association of github repository and travis, during a commit (by default on all branches), the pipeline will perform the following stages:
+
+- "Build and Test" -> carrying out tests and building the application
+- "Package" -> Deposit in Docker Hub
+- "Deploy" -> Deployment via Ansible
+
+As Travis is a neutral machine, we use docker to be able to run our applications (test, build, run etc ...). Dockerfile allows you to configure our own docker images, and docker-compose allows you to use several dockerfiles to run our application (in this case our internships).
+
+To be able to deploy our application on the remote server with Ansible and Travis, we transmitted an encrypted version of the RSA key, for which the deployment job can decrypt it with Ansible Vault and can then connect in RSA to the EC2 instance for perform the deployment.
