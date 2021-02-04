@@ -209,3 +209,34 @@ As Travis is a neutral machine, we use docker to be able to run our applications
   
 
 To be able to deploy our application on the remote server with Ansible and Travis, we transmitted an encrypted version of the RSA key, for which the deployment job can decrypt it with Ansible Vault and can then connect in RSA to the EC2 instance for perform the deployment.
+
+# TP 04/02/2021: Extra
+
+> **Ask yourself: why can we easily load balance between our backends? Heard of sticky sessions or stateless apps?**
+
+apache allows you to easily do load balancing. In the appache conf (httpd.conf) ->
+
+    <Proxy "balancer: // backend_cluser">
+         BalancerMember "http: // backend_blue: 8080 /"
+         BalancerMember "http: // backend_green: 8080 /"
+    </Proxy>
+
+we modify that:
+
+    <VirtualHost *: 80>
+         ProxyPreserveHost On
+         ProxyPass / api http: // backend: 8080 / api
+         ProxyPassReverse / api http: // backend: 8080 / api
+    </VirtualHost>
+
+in this:
+
+    <VirtualHost *: 80>
+             ProxyPreserveHost On
+             ProxyPass / api balancer: // backend_cluser / api
+             ProxyPassReverse / api balancer: // backend_cluser / api
+    </VirtualHost>
+
+and this module: 
+
+    LoadModule mod_proxy_balancer modules/mod_proxy_balancer.so
