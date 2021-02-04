@@ -4,4 +4,4 @@ all:
     ansible_ssh_private_key_file: id_rsa
   children:
     prod:
-      hosts: louis.morandet.takima.cloud
+      hosts: jeremy.laurent.takima.cloud
