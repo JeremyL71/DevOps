@@ -214,14 +214,22 @@ To be able to deploy our application on the remote server with Ansible and Travi
 
 > **Ask yourself: why can we easily load balance between our backends? Heard of sticky sessions or stateless apps?**
 
-apache allows you to easily do load balancing. In the appache conf (httpd.conf) ->
+apache allows you to easily do load balancing. In the appache conf (httpd.conf), activate the necessary modules ->
+
+    LoadModule mod_proxy_balancer modules/mod_proxy_balancer.so
+    LoadModule slotmem_shm_module modules/mod_slotmem_shm.so
+    LoadModule lbmethod_byrequests_module modules/mod_lbmethod_byrequests.so
+    
+create the proxy balancer :
 
     <Proxy "balancer: // backend_cluser">
-         BalancerMember "http: // backend_blue: 8080 /"
-         BalancerMember "http: // backend_green: 8080 /"
+        <Proxy "balancer://backend_cluser">
+        BalancerMember "http://backend_blue:8080/"
+        BalancerMember "http://backend_green:8080/"
+        ProxySet stickysession=ROUTEID
     </Proxy>
 
-we modify that:
+and finally modify the reverse proxy to request the link of the balancer. Modify this :
 
     <VirtualHost *: 80>
          ProxyPreserveHost On
@@ -229,7 +237,7 @@ we modify that:
          ProxyPassReverse / api http: // backend: 8080 / api
     </VirtualHost>
 
-in this:
+into this:
 
     <VirtualHost *: 80>
              ProxyPreserveHost On
@@ -237,6 +245,12 @@ in this:
              ProxyPassReverse / api balancer: // backend_cluser / api
     </VirtualHost>
 
-and this module: 
+To use sticky session, one customer have to request the same server all the time he use the service. We can add a route id and put a cookie contain the route id the customer navigator :
 
-    LoadModule mod_proxy_balancer modules/mod_proxy_balancer.so
+    Header add Set-Cookie "ROUTEID=.%{BALANCER_WORKER_ROUTE}e; path=/" env=BALANCER_ROUTE_CHANGED
+    <Proxy "balancer: // backend_cluser">
+        <Proxy "balancer://backend_cluser">
+        BalancerMember "http://backend_blue:8080/" route=1
+        BalancerMember "http://backend_green:8080/" route=2
+        ProxySet stickysession=ROUTEID
+    </Proxy> 
